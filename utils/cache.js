@@ -3,7 +3,7 @@ import NodeCache from "node-cache";
 const cache = new NodeCache({stdTTL:60, checkperiod:90});
 
 async function getOrFetch(Key, fetchFn, ttlSeconds){
-    const cached = cached.get(key);
+    const cached = cache.get(key);
 
     if(cached !== undefined){
         return {
