@@ -23,4 +23,4 @@ function errorHandler(req, res, err, next){
     });
 };
 
-export default {asyncHandler, errorHandler};
+export {asyncHandler, errorHandler};

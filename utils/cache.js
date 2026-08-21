@@ -30,4 +30,4 @@ async function getOrFetch(Key, fetchFn, ttlSeconds){
 
 };
 
-export default {getOrFetch, invalidate, stats};
+export  {getOrFetch, invalidate, stats};
