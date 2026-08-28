@@ -1,5 +1,5 @@
 import httpClient from "../utils/httpClient.js";
-import {getOrFetch} from "../utils/cache.js"
+import {getOrFetch, invalidate} from "../utils/cache.js"
 
 async function getPostService(id){
     return getOrFetch(`post: ${id}`, async()=> {
