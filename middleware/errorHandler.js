@@ -2,7 +2,7 @@ function asyncHandler(fn){
     return (req,res, next)=> Promise.resolve(fn(req,res,next)).catch(next);
 }
 
-function errorHandler(req, res, err, next){
+function errorHandler( err, req, res, next){
     console.error(`[error] ${req.method} ${req.originalUrl}`, err.message);
 
     if(err.response){
