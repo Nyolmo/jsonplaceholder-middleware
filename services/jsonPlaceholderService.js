@@ -1,7 +1,7 @@
 import httpClient from "../utils/httpClient.js";
 import {getOrFetch} from "../utils/cache.js"
 
-async function getPost(id){
+async function getPostService(id){
     return getOrFetch(`post: ${id}`, async()=> {
         const {data} = await httpClient.get(`/posts/${id}`);
 
@@ -11,7 +11,7 @@ async function getPost(id){
 
  //Get a page of posts, with optional filtering by userId and sorting.
  //The cache key includes every input that affects the result...so that different sorts & filter page combii never collide in our cache..
-async function getPosts({ page = 1, limit = 10, userId, sortBy, order = 'asc' } = {}) {
+async function getPostsService({ page = 1, limit = 10, userId, sortBy, order = 'asc' } = {}) {
   const cacheKey = `posts:page=${page}:limit=${limit}:userId=${userId || 'all'}:sortBy=${sortBy || 'none'}:order=${order}`;
  
   return getOrFetch(cacheKey, async()=>{
@@ -47,7 +47,7 @@ async function getPosts({ page = 1, limit = 10, userId, sortBy, order = 'asc' } 
 
 // Creates a post via the upstream API and clears the cached posts list
 // so the new post shows up on the next GET instead of a stale one...
-async function createPost({ title, body, userId }) {
+async function createPostService({ title, body, userId }) {
   const { data } = await httpClient.post('/posts', { title, body, userId });
 
   invalidate(`posts:page=1:limit=10:userId=all:sortBy=none:order=asc`);
@@ -57,7 +57,7 @@ async function createPost({ title, body, userId }) {
 
 //Aggregation of user => one call to user that pulls user data, posts, comments...everything in parallel(one call)
 
-async function getUserSummary(userId){
+async function getUserSummaryService(userId){
     return getOrFetch(`user-summary: ${userId}`, async()=>{
         const [userRes, postRes] = await Promise.all([
             httpClient.get(`/users/${userId}`),
