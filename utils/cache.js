@@ -1,33 +1,26 @@
 import NodeCache from "node-cache";
 
-const cache = new NodeCache({stdTTL:60, checkperiod:90});
+const cache = new NodeCache({ stdTTL: 60, checkperiod: 90 });
 
-async function getOrFetch(Key, fetchFn, ttlSeconds){
-    const cached = cache.get(key);
+async function getOrFetch(key, fetchFn, ttlSeconds) {
+  const cached = cache.get(key);
 
-    if(cached !== undefined){
-        return {
-            data: cached,
-            fromCache: true
-        };
-    }
+  if (cached !== undefined) {
+    return { data: cached, fromCache: true };
+  }
 
-    const data = await fetchFn();
-    cache.set(key, data, ttlSeconds);
+  const data = await fetchFn();
+  cache.set(key, data, ttlSeconds);
 
-    return {
-        data,
-        fromCache: false
-    };
+  return { data, fromCache: false };
+}
 
-    function invalidate(key){
-        cache.del(key)
-    };
+function invalidate(key) {
+  cache.del(key);
+}
 
-    function stats(){
-        return cache.getStats();
-    }
+function stats() {
+  return cache.getStats();
+}
 
-};
-
-export  {getOrFetch, invalidate, stats};
+export { getOrFetch, invalidate, stats };
