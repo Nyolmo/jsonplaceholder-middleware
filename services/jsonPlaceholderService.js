@@ -1,5 +1,5 @@
 import httpClient from "../utils/httpClient.js";
-import getOrFetch from "../utils/cache.js"
+import {getOrFetch} from "../utils/cache.js"
 
 async function getPost(id){
     return getOrFetch(`post: ${id}`, async()=> {
@@ -40,7 +40,7 @@ async function getUserSummary(userId){
         const user = userRes.data;
         const posts = postRes.data;
 
-        const commentCounts = Promise.all(
+        const commentCounts = await Promise.all(
             posts.map((post)=> 
                 httpClient
                         .get('/comments', {params: {postId:post.id}})
