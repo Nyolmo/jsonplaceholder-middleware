@@ -95,4 +95,4 @@ async function getUserSummaryService(userId){
     }, 120);
 }
 
-export  { getPost,createPost, getPosts, getUserSummary };
+export  { getPostService,createPostService, getPostsService, getUserSummaryService };
