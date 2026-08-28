@@ -9,23 +9,50 @@ async function getPost(id){
     });
 }
 
+ //Get a page of posts, with optional filtering by userId and sorting.
+ //The cache key includes every input that affects the result...so that different sorts & filter page combii never collide in our cache..
+async function getPosts({ page = 1, limit = 10, userId, sortBy, order = 'asc' } = {}) {
+  const cacheKey = `posts:page=${page}:limit=${limit}:userId=${userId || 'all'}:sortBy=${sortBy || 'none'}:order=${order}`;
+ 
+  return getOrFetch(cacheKey, async()=>{
+    const params = userId? {userId} : {};    
+    const { data: allPosts } = await httpClient.get('/posts');
 
-async function getPosts({page=1, limit=10}={}){
-    return getOrFetch(`posts: page:${page}:limit:${limit}`, async()=>{
-        const { data: allPosts } = await httpClient.get('/posts');
+    let results = [...allPosts];
 
-        const start = (page-1) * limit;
-        const pageItems = allPosts.slice(start, start + limit);
+    if(sortBy === 'title'){
+        results.sort((a,b)=> a.title.localeCompare(b.title));
+    }else if(sortBy === 'id'){
+        results.sort((a,b)=> a.id - b.id);
+    }
 
-        return {
+    if(order==='desc'){
+        results.reverse();
+    }
+
+    const start = (page-1) * limit;
+    const pageItems = results.slice(start, start + limit);
+
+    return {
             items: pageItems,
             page,
             limit,
-            total: allPosts.length,
-            totalPages: Math.ceil(allPosts.length/limit)
+            total: results.length,
+            totalPages: Math.ceil(results.length/limit),
+            filters: { userId: userId || null, sortBy: sortBy || null, order },
         };
     });
 
+}
+
+// Creates a post via the upstream API and clears the cached posts list
+// so the new post shows up on the next GET instead of a stale one...
+async function createPost({ title, body, userId }) {
+  const { data } = await httpClient.post('/posts', { title, body, userId });
+
+  invalidate(`posts:page=1:limit=10:userId=all:sortBy=none:order=asc`);
+ 
+  return data;
 }
 
 //Aggregation of user => one call to user that pulls user data, posts, comments...everything in parallel(one call)
@@ -68,4 +95,4 @@ async function getUserSummary(userId){
     }, 120);
 }
 
-export  { getPost, getPosts, getUserSummary };
+export  { getPost,createPost, getPosts, getUserSummary };
