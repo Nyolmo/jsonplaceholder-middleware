@@ -1,14 +1,21 @@
 import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import { config } from 'dotenv';
 import { limiter } from './middleware/rateLimiter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import postRouter from './routes/postRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import { stats } from './utils/cache.js';
 
+config();
+
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
+app.use(helmet());
+app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
 app.use(express.json());
 
 // Rate limiting applies to the whole /api surface — protects both
