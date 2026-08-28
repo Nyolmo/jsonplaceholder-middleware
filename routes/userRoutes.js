@@ -8,4 +8,4 @@ const userRouter = express.Router();
 // Aggregation endpoint: user + their posts + comment counts, in one call...
 userRouter.get('/:id/summary', asyncHandler(getUserSummary));
 
-export default router;
+export default userRouter;
